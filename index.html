@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMC Church Resource Hub</title>
+    <style>
+        :root {
+            --bg-main: #f4f5f7;
+            --surface-card: #ffffff;
+            --navy-primary: #0f172a;
+            --navy-secondary: #1e293b;
+            --gold-accent: #c5a059;
+            --gold-hover: #b08d46;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --badge-bg: #f1f5f9;
+            --danger-red: #ef4444;
+            --danger-hover: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+        }
+
+        /* Header Navigation */
+        header {
+            background-color: var(--navy-primary);
+            color: #ffffff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .logo span { color: var(--gold-accent); }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            padding: 0.2rem 0;
+        }
+
+        nav a:hover, nav a.active { color: var(--gold-accent); }
+
+        /* Main Layout */
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        aside.sidebar {
+            background-color: #ffffff;
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .btn-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.85rem 0;
+            background-color: var(--gold-accent);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(197, 160, 89, 0.2);
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-upload:hover { background-color: var(--gold-hover); }
+
+        /* Main Content Area */
+        main.content { padding: 1.5rem; }
+
+        .search-container { margin-bottom: 1.5rem; }
+        .search-container input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .search-container input:focus { border-color: var(--navy-primary); }
+
+        .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+        .content-header h2 { font-size: 1.15rem; font-weight: 600; color: var(--navy-primary); margin: 0; }
+        .result-count { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Resource Grid & Cards */
+        .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+        .card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .card-type { background-color: var(--badge-bg); color: var(--navy-secondary); padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .card-title { font-size: 1.05rem; font-weight: 600; line-height: 1.4; color: var(--navy-primary); margin: 0.5rem 0; }
+        .card-meta { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+        .card-footer { border-top: 1px solid var(--border-color); padding-top: 0.85rem; display: flex; gap: 0.5rem; }
+
+        .btn-action { flex: 1; padding: 0.6rem 0; text-align: center; font-size: 0.85rem; font-weight: 600; border-radius: 4px; text-decoration: none; cursor: pointer; }
+        .btn-preview { background-color: transparent; color: var(--navy-secondary); border: 1px solid var(--border-color); }
+        .btn-preview:hover { background-color: var(--badge-bg); }
+        .btn-download { background-color: var(--navy-primary); color: #ffffff; border: 1px solid var(--navy-primary); }
+        .btn-download:hover { background-color: var(--navy-secondary); }
+        
+        .btn-delete { 
+            background: none; 
+            border: none; 
+            color: var(--danger-red); 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            padding: 0.2rem 0.5rem; 
+            border-radius: 4px; 
+            transition: background 0.2s;
+        }
+        .btn-delete:hover { background-color: #fee2e2; }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none; background: none;
+        }
+
+        .modal-title { font-size: 1.2rem; font-weight: 700; color: var(--navy-primary); margin-top: 0; }
+        .modal-body { margin-top: 1rem; line-height: 1.6; font-size: 0.9rem; color: var(--navy-secondary); }
+
+        .preview-box {
+            background: #f8fafc;
+            border: 1px dashed var(--border-color);
+            padding: 0.75rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+            color: var(--text-muted);
+            max-height: 350px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .preview-box img {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+        .preview-box iframe {
+            width: 100%;
+            height: 320px;
+            border: none;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px;
+        }
+
+        /* 📱 手机端移动适配关键样式 (Mobile Responsive CSS) */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            nav {
+                width: 100%;
+                justify-content: space-between;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 0.5rem;
+            }
+            .layout-wrapper {
+                grid-template-columns: 1fr; /* 手机上取消侧边栏，变成单列布局 */
+            }
+            aside.sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 1rem;
+            }
+            main.content {
+                padding: 1rem;
+            }
+            .resource-grid {
+                grid-template-columns: 1fr; /* 手机上每行只放一个卡片 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="logo" onclick="filterByCategory('all')">WMC <span>Resource Hub</span></div>
+        <nav>
+            <a id="nav-all" class="active" onclick="filterByCategory('all')">Catalog</a>
+            <a id="nav-sermon" onclick="filterByCategory('sermon')">Sermons</a>
+            <a id="nav-study" onclick="filterByCategory('study')">Bible Study</a>
+            <a id="nav-template" onclick="filterByCategory('template')">Templates</a>
+        </nav>
+    </header>
+
+    <!-- Main Layout Wrapper -->
+    <div class="layout-wrapper">
+
+        <!-- Sidebar (手机端会自动置顶) -->
+        <aside class="sidebar">
+            <button class="btn-upload" onclick="openModal('upload-modal')">
+                <span>+</span> Upload Resource
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="search-input" onkeyup="filterResources()" placeholder="Search by scripture, speaker, or title...">
+            </div>
+
+            <!-- Content Header -->
+            <div class="content-header">
+                <h2 id="page-title">All Resources</h2>
+                <span class="result-count" id="result-count">Loading...</span>
+            </div>
+
+            <!-- Resource Grid -->
+            <div class="resource-grid" id="resource-grid">
+                <!-- 动态数据区域 -->
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Modal 1: Document Preview -->
+    <div id="preview-modal" class="modal-overlay" onclick="closeModal('preview-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('preview-modal')">✕</button>
+            <h3 class="modal-title" id="preview-title">Document Preview</h3>
+            <div class="modal-body">
+                <p id="preview-meta">Meta details...</p>
+                <div class="preview-box" id="preview-container">
+                    <p>Loading preview...</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <a id="preview-download-btn" href="#" target="_blank" download class="btn-action btn-download" style="text-align: center;">Download File</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Upload Resource -->
+    <div id="upload-modal" class="modal-overlay" onclick="closeModal('upload-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('upload-modal')">✕</button>
+            <h3 class="modal-title">Upload New Resource</h3>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Resource Title</label>
+                    <input type="text" id="upload-title" placeholder="e.g., Sermon On The Mount">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="upload-category">
+                        <option value="sermon">Sermon Notes</option>
+                        <option value="study">Bible Study Guides</option>
+                        <option value="template">Ministry Templates</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Speaker / Author (Optional)</label>
+                    <input type="text" id="upload-speaker" placeholder="e.g., Pastor Zhang">
+                </div>
+                <div class="form-group">
+                    <label>Scripture Reference (Optional)</label>
+                    <input type="text" id="upload-scripture" placeholder="e.g., Matthew 5:1-12">
+                </div>
+                <div class="form-group">
+                    <label>File Upload</label>
+                    <input type="file" id="upload-file">
+                </div>
+                <button class="btn-upload" style="margin-top: 1rem;" onclick="uploadResource()">Submit Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. 引入 Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 2. 所有 JavaScript 逻辑 -->
+    <script>
+        const SUPABASE_URL = 'https://lkhtjvvfsmpuyxcngfxy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_g3yzOoZpM9QbkW1DY1L_zQ_MSmWP6Jn';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let activeCategory = 'all';
+
+        window.onload = function() {
+            fetchResources();
+        };
+
+        async function fetchResources() {
+            const grid = document.getElementById('resource-grid');
+            grid.innerHTML = '<p>Loading resources...</p>';
+
+            const { data, error } = await supabaseClient
+                .from('resources')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching data:', error);
+                grid.innerHTML = `<p style="color:red;">Loading error: ${error.message}</p>`;
+                return;
+            }
+
+            grid.innerHTML = ''; 
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<p>No resources found.</p>';
+                document.getElementById('result-count').innerText = 'Showing 0 items';
+                return;
+            }
+
+            data.forEach(item => {
+                const categoryUpper = item.category ? item.category.toUpperCase() : 'RESOURCE';
+                const speakerText = item.speaker || 'N/A';
+                const scriptureText = item.scripture || 'N/A';
+                const dateText = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A';
+                const searchString = `${item.title} ${speakerText} ${scriptureText}`.toLowerCase();
+
+                const cardHtml = `
+                    <div class="card" data-category="${item.category}" data-search="${searchString}">
+                        <div>
+                            <div class="card-header">
+                                <span class="card-type">${categoryUpper}</span>
+                                <button class="btn-delete" onclick="deleteResource('${item.id}', '${escapeJs(item.title)}')">🗑 Delete</button>
+                            </div>
+                            <h3 class="card-title">${item.title}</h3>
+                            <div class="card-meta">
+                                Speaker/Author: ${speakerText}<br>
+                                Scripture: ${scriptureText}<br>
+                                Date: ${dateText}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-action btn-preview" onclick="openPreview('${escapeJs(item.title)}', '${escapeJs(speakerText)}', '${escapeJs(scriptureText)}', '${item.file_url}')">Preview</button>
+                            <a href="${item.file_url}" target="_blank" download class="btn-action btn-download">Download</a>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+
+            filterResources();
+        }
+
+        async function deleteResource(id, title) {
+            if (!confirm(`Are you sure you want to delete "${title}"?`)) {
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('resources')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Delete failed: ' + error.message);
+            } else {
+                alert('Deleted successfully!');
+                fetchResources();
+            }
+        }
+
+        function openPreview(title, speaker, scripture, fileUrl) {
+            document.getElementById('preview-title').innerText = title;
+            document.getElementById('preview-meta').innerHTML = `<strong>Author/Speaker:</strong> ${speaker} | <strong>Scripture:</strong> ${scripture}`;
+            document.getElementById('preview-download-btn').href = fileUrl || '#';
+
+            const container = document.getElementById('preview-container');
+            container.innerHTML = '';
+
+            if (!fileUrl) {
+                container.innerHTML = '<p>No preview available for this file.</p>';
+            } else {
+                const lowerUrl = fileUrl.toLowerCase();
+                if (lowerUrl.endsWith('.jpg') || lowerUrl.endsWith('.jpeg') || lowerUrl.endsWith('.png') || lowerUrl.endsWith('.gif') || lowerUrl.endsWith('.webp')) {
+                    container.innerHTML = `<img src="${fileUrl}" alt="Preview Image" />`;
+                } else if (lowerUrl.endsWith('.pdf')) {
+                    container.innerHTML = `<iframe src="${fileUrl}"></iframe>`;
+                } else {
+                    container.innerHTML = `
+                        <div>
+                            📄 <strong>Document file detected.</strong><br>
+                            <small style="color:#64748b;">Direct browser rendering isn't supported for this format.</small><br><br>
+                            <a href="${fileUrl}" target="_blank" style="color:#c5a059; font-weight:600;">Click here to view/open directly</a>
+                        </div>
+                    `;
+                }
+            }
+
+            openModal('preview-modal');
+        }
+
+        async function uploadResource() {
+            const title = document.getElementById('upload-title').value;
+            const category = document.getElementById('upload-category').value;
+            const speaker = document.getElementById('upload-speaker').value.trim();
+            const scripture = document.getElementById('upload-scripture').value.trim();
+            const fileInput = document.getElementById('upload-file');
+            const file = fileInput.files[0];
+
+            if (!title || !file) {
+                alert('Please fill in title and select a file.');
+                return;
+            }
+
+            const filePath = `uploads/${Date.now()}_${file.name}`;
+            const { data: fileData, error: fileError } = await supabaseClient.storage
+                .from('church-files')
+                .upload(filePath, file);
+
+            if (fileError) {
+                alert('File upload failed: ' + fileError.message);
+                return;
+            }
+
+            const { data: urlData } = supabaseClient.storage
+                .from('church-files')
+                .getPublicUrl(filePath);
+
+            const publicUrl = urlData.publicUrl;
+
+            const { error: dbError } = await supabaseClient
+                .from('resources')
+                .insert([
+                    { 
+                        title: title, 
+                        category: category, 
+                        speaker: speaker || null, 
+                        scripture: scripture || null, 
+                        file_url: publicUrl 
+                    }
+                ]);
+
+            if (dbError) {
+                alert('Database insert failed: ' + dbError.message);
+            } else {
+                alert('Resource uploaded successfully!');
+                closeModal('upload-modal');
+                document.getElementById('upload-title').value = '';
+                document.getElementById('upload-speaker').value = '';
+                document.getElementById('upload-scripture').value = '';
+                document.getElementById('upload-file').value = '';
+                fetchResources(); 
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function filterByCategory(category) {
+            activeCategory = category;
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            
+            if (category === 'all') {
+                document.getElementById('nav-all').classList.add('active');
+                document.getElementById('page-title').innerText = 'All Resources';
+            } else if (category === 'sermon') {
+                document.getElementById('nav-sermon').classList.add('active');
+                document.getElementById('page-title').innerText = 'Sermons';
+            } else if (category === 'study') {
+                document.getElementById('nav-study').classList.add('active');
+                document.getElementById('page-title').innerText = 'Bible Study Guides';
+            } else if (category === 'template') {
+                document.getElementById('nav-template').classList.add('active');
+                document.getElementById('page-title').innerText = 'Ministry Templates';
+            }
+
+            filterResources();
+        }
+
+        function filterResources() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const cardSearchText = card.getAttribute('data-search') || '';
+
+                const matchesCategory = (activeCategory === 'all' || cardCategory === activeCategory);
+                const matchesSearch = cardSearchText.includes(searchText);
+
+                if (matchesCategory && matchesSearch) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            document.getElementById('result-count').innerText = `Showing ${visibleCount} items`;
+        }
+
+        function escapeJs(str) {
+            return str ? str.replace(/'/g, "\\'").replace(/"/g, '&quot;') : '';
+        }
+    </script>
+</body>
+</html>
